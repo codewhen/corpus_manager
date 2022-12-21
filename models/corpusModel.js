@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 
 const CorpusSchema = new Schema({
   entries: {
-    type: [mongoose.Types.ObjectId],
+    type: Map,
+    of: String,
   },
 });
 

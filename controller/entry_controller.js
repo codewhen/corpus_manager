@@ -34,7 +34,11 @@ exports.addEntrySimpleText = async (req, res) => {
     });
     const corpusUpdate = await CorpusModel.updateOne(
       { _id: corpus._id },
-      { $push: { entries: entry._id } }
+      {
+        $set: {
+          [`entries.${language.name}`]: entry.content,
+        },
+      }
     );
     res.status(201).json({
       entry: entry,

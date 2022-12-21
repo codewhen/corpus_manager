@@ -1,5 +1,4 @@
 const CorpusModel = require("../models/corpusModel");
-const EntryModel = require("../models/entryModel");
 const LanguageModel = require("../models/languageModel");
 
 exports.addEntrySimpleText = async (req, res) => {
@@ -9,7 +8,9 @@ exports.addEntrySimpleText = async (req, res) => {
     });
   }
   try {
-    const language = await LanguageModel.findOne({ name: req.body.language });
+    const language = await LanguageModel.findOne({
+      name: req.body.language.toLowerCase(),
+    });
     if (!language) {
       return res.status(400).json({
         message: "language not found",
@@ -25,23 +26,18 @@ exports.addEntrySimpleText = async (req, res) => {
       }
     } else {
       corpus = await CorpusModel.create({});
-      console.log(corpus);
     }
-    const entry = await EntryModel.create({
-      language: language._id,
-      content: req.body.content,
-      corpusId: corpus._id,
-    });
     const corpusUpdate = await CorpusModel.updateOne(
       { _id: corpus._id },
       {
         $set: {
-          [`entries.${language.name}`]: entry.content,
+          [`entries.${language.name}`]: req.body.content,
         },
       }
     );
+    corpus = await CorpusModel.findOne({ _id: corpus._id });
     res.status(201).json({
-      entry: entry,
+      corpus: corpus,
     });
   } catch (err) {
     console.debug(err);

@@ -8,7 +8,9 @@ exports.addLanguage = async (req, res) => {
   }
 
   try {
-    const language = await LanguageModel.create({ name: req.body.name });
+    const language = await LanguageModel.create({
+      name: req.body.name.toLowerCase(),
+    });
     res.status(201).json({
       language: language,
     });

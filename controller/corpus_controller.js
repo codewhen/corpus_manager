@@ -11,3 +11,17 @@ exports.addNewRow = async (req, res) => {
     corpus: corpus,
   });
 };
+
+exports.showAllRow = async (req, res) => {
+  try {
+    const corpus = await CorpusModel.find();
+    res.status(200).json({
+      corpus: corpus,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};

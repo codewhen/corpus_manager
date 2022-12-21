@@ -3,11 +3,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const CorpusSchema = new Schema({
-  sid: {
-    type: String,
-    // required: true,
-    // unique: true,
-  },
   entries: {
     type: [mongoose.Types.ObjectId],
   },

@@ -9,13 +9,9 @@ const EntrySchema = new Schema({
   },
   content: {
     type: String,
-    unique: true,
+    unique: false,
     required: true,
   },
-  // sid: {
-  //   type: String,
-  //   required: true,
-  // },
   corpusId: {
     type: mongoose.Types.ObjectId,
     required: true,

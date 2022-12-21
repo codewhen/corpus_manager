@@ -19,12 +19,12 @@ exports.addEntrySimpleText = async (req, res) => {
     if (req.body.corpusId) {
       corpus = await CorpusModel.findOne({ _id: req.body.corpusId });
       if (!corpus) {
-        res.status(400).json({
+        return res.status(400).json({
           message: "corpus not found",
         });
       }
     } else {
-      corpus = await CorpusModel.create({ entries: [] });
+      corpus = await CorpusModel.create({});
       console.log(corpus);
     }
     const entry = await EntryModel.create({
@@ -32,8 +32,8 @@ exports.addEntrySimpleText = async (req, res) => {
       content: req.body.content,
       corpusId: corpus._id,
     });
-    await CorpusModel.updateOne(
-      { _id: req.body.corpusId },
+    const corpusUpdate = await CorpusModel.updateOne(
+      { _id: corpus._id },
       { $push: { entries: entry._id } }
     );
     res.status(201).json({

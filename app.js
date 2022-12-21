@@ -11,6 +11,9 @@ dotenv.config({ path: "./.env" });
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var authRouter = require("./routes/auth");
+var languageRouter = require("./routes/language");
+var entryRouter = require("./routes/entry");
+var corpusRouter = require("./routes/corpus");
 
 var app = express();
 require("./middleware/auth/auth");
@@ -38,6 +41,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);
+app.use("/lang", languageRouter);
+app.use("/entry", entryRouter);
+app.use("/corpus", corpusRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

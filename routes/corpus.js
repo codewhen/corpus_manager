@@ -23,4 +23,11 @@ router.get(
   CorpusController.showUnassignedRow
 );
 
+router.post(
+  "/assignUser",
+  passport.authenticate("jwt", { session: false }),
+  mustAdmin,
+  CorpusController.assignUser
+);
+
 module.exports = router;

@@ -39,3 +39,28 @@ exports.showUnassignedRow = async (req, res) => {
     });
   }
 };
+
+exports.assignUser = async (req, res) => {
+  try {
+    const data = req.body;
+    if (!data.userId || !data.rowIds) {
+      res.status(400).json({
+        message: "userId or rowIds missing",
+      });
+    }
+    for (const rowId of data.rowIds) {
+      await CorpusModel.updateOne(
+        { _id: rowId },
+        { assigned: data.userId, assignedAt: Date.now() }
+      );
+    }
+    res.status(200).json({
+      message: `${data.rowIds.length} are assigned`,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};

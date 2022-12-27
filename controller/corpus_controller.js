@@ -28,7 +28,13 @@ exports.showAllRow = async (req, res) => {
 
 exports.showUnassignedRow = async (req, res) => {
   try {
-    const corpus = await CorpusModel.find({ assigned: null }).limit(50);
+    //Aging// 5 days//
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 5);
+    //End Aging//
+    const corpus = await CorpusModel.find({
+      $or: [{ assigned: null }, { assignedAt: { $lt: cutoff } }],
+    }).limit(50);
     res.status(200).json({
       corpus: corpus,
     });

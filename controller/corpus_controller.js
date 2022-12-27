@@ -25,3 +25,17 @@ exports.showAllRow = async (req, res) => {
     });
   }
 };
+
+exports.showUnassignedRow = async (req, res) => {
+  try {
+    const corpus = await CorpusModel.find({ assigned: null }).limit(50);
+    res.status(200).json({
+      corpus: corpus,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};

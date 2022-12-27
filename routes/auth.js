@@ -3,6 +3,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 var router = express.Router();
 const UserModel = require("../models/userModel");
+const { mustAdmin } = require("../middleware/auth/admin");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -19,7 +20,7 @@ router.post(
       email: data.email,
       password: data.password,
       name: data.name,
-      role: data.role,
+      role: "user-level-3",
     });
 
     const body = { _id: user._id, email: user.email };
@@ -29,6 +30,34 @@ router.post(
       message: "Signup successful",
       user: user,
       token: token,
+    });
+  }
+);
+
+router.post(
+  "/set-role",
+  passport.authenticate("jwt", { session: false }),
+  mustAdmin,
+  async (req, res, next) => {
+    const data = req.body;
+    if (!data.id || !data.role) {
+      return res.status(400).json({
+        message: "id or role is not mentioned",
+      });
+    }
+
+    const user = await UserModel.updateOne(
+      {
+        _id: data.id,
+      },
+      {
+        role: data.role,
+      }
+    );
+
+    res.status(201).json({
+      message: "Role update successful",
+      user: user,
     });
   }
 );

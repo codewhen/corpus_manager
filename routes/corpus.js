@@ -30,4 +30,10 @@ router.post(
   CorpusController.assignUser
 );
 
+router.get(
+  "/getAssignedRowsForCurrentUser",
+  passport.authenticate("jwt", { session: false }),
+  CorpusController.getAssignedRowsForCurrentUser
+);
+
 module.exports = router;

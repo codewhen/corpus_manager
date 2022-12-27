@@ -70,3 +70,24 @@ exports.assignUser = async (req, res) => {
     });
   }
 };
+
+exports.getAssignedRowsForCurrentUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    //Aging// 5 days//
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 5);
+    //End Aging//
+    const corpus = await CorpusModel.find({
+      $and: [{ assigned: userId }, { assignedAt: { $gte: cutoff } }],
+    }).limit(50);
+    res.status(200).json({
+      corpus: corpus,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};

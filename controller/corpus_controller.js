@@ -7,9 +7,7 @@ exports.addNewRow = async (req, res) => {
     });
   }
   const corpus = await CorpusModel.create({ sid: req.body.sid });
-  res.status(201).json({
-    corpus: corpus,
-  });
+  res.status(201).json(corpus);
 };
 
 exports.deleteRow = async (req, res) => {

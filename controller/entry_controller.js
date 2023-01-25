@@ -8,9 +8,7 @@ exports.addEntrySimpleText = async (req, res) => {
     });
   }
   try {
-    const language = await LanguageModel.findOne({
-      name: req.body.language.toLowerCase(),
-    });
+    const language = await LanguageModel.findById(req.body.language);
     if (!language) {
       return res.status(400).json({
         message: "language not found",
@@ -36,9 +34,7 @@ exports.addEntrySimpleText = async (req, res) => {
       }
     );
     corpus = await CorpusModel.findOne({ _id: corpus._id });
-    res.status(201).json({
-      corpus: corpus,
-    });
+    res.status(201).json(corpus);
   } catch (err) {
     console.debug(err);
     res.status(500).json({

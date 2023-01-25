@@ -12,12 +12,22 @@ exports.addNewRow = async (req, res) => {
   });
 };
 
+exports.deleteRow = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({
+      message: "id is missing in param",
+    });
+  }
+  const corpus = await CorpusModel.deleteOne({ _id: req.params.id });
+  res.status(201).json(corpus);
+};
+
 exports.showAllRow = async (req, res) => {
   try {
     const corpus = await CorpusModel.find();
-    res.status(200).json({
-      corpus: corpus,
-    });
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Content-Range", "bytes : 0-9/");
+    res.status(200).json(corpus);
   } catch (err) {
     console.log(err);
     res.status(500).json({

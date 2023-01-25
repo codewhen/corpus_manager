@@ -16,6 +16,12 @@ router.get(
   CorpusController.showAllRow
 );
 
+router.delete(
+  "/all/:id",
+  passport.authenticate("jwt", { session: false }),
+  CorpusController.deleteRow
+);
+
 router.get(
   "/showUnassignedRow",
   passport.authenticate("jwt", { session: false }),

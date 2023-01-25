@@ -42,7 +42,7 @@ exports.update = async (req, res) => {
         message: "language not found",
       });
     }
-    const corpus = await CorpusModel.findOne({ _id: req.params.id });
+    let corpus = await CorpusModel.findOne({ _id: req.params.id });
     if (!corpus) {
       return res.status(400).json({
         message: "corpus not found",

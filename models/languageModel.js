@@ -15,6 +15,14 @@ const LanguageSchema = new Schema(
   }
 );
 
+LanguageSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    delete ret.__id;
+  },
+});
+
 const LanguageModel = mongoose.model("languages", LanguageSchema);
 
 module.exports = LanguageModel;

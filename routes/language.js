@@ -12,4 +12,18 @@ router.post(
   LanguageController.addLanguage
 );
 
+router.get(
+  "/all",
+  passport.authenticate("jwt", { session: false }),
+  mustAdmin,
+  LanguageController.allLanguage
+);
+
+router.delete(
+  "/all/:id",
+  passport.authenticate("jwt", { session: false }),
+  mustAdmin,
+  LanguageController.deleteLanguage
+);
+
 module.exports = router;

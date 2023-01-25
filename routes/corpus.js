@@ -5,15 +5,27 @@ var CorpusController = require("../controller/corpus_controller");
 const { mustAdmin } = require("../middleware/auth/admin");
 
 router.post(
-  "/addNewRow",
+  "/create",
   passport.authenticate("jwt", { session: false }),
-  CorpusController.addNewRow
+  CorpusController.create
 );
 
 router.get(
   "/all",
   passport.authenticate("jwt", { session: false }),
   CorpusController.showAllRow
+);
+
+router.get(
+  "/all/:id",
+  passport.authenticate("jwt", { session: false }),
+  CorpusController.showSingleRow
+);
+
+router.put(
+  "/all/:id",
+  passport.authenticate("jwt", { session: false }),
+  CorpusController.update
 );
 
 router.delete(

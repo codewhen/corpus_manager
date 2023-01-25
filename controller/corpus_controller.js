@@ -1,13 +1,69 @@
 const CorpusModel = require("../models/corpusModel");
+const LanguageModel = require("../models/languageModel");
 
-exports.addNewRow = async (req, res) => {
-  if (!req.body.sid) {
+exports.create = async (req, res) => {
+  if (!req.body.language || !req.body.content) {
     return res.status(400).json({
-      message: "sid is missing in body",
+      message: "language or content or corpusId is missing in body",
     });
   }
-  const corpus = await CorpusModel.create({ sid: req.body.sid });
-  res.status(201).json(corpus);
+  try {
+    const language = await LanguageModel.findById(req.body.language);
+    if (!language) {
+      return res.status(400).json({
+        message: "language not found",
+      });
+    }
+    const corpus = await CorpusModel.create({
+      $set: {
+        [`entries.${language.name}`]: req.body.content,
+      },
+    });
+    corpus = await CorpusModel.findOne({ _id: corpus._id });
+    res.status(201).json(corpus);
+  } catch (err) {
+    console.debug(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};
+
+exports.update = async (req, res) => {
+  if (!req.body.language || !req.body.content || !req.params.id) {
+    return res.status(400).json({
+      message: "language or content or corpusId is missing in body",
+    });
+  }
+  try {
+    const language = await LanguageModel.findById(req.body.language);
+    if (!language) {
+      return res.status(400).json({
+        message: "language not found",
+      });
+    }
+    const corpus = await CorpusModel.findOne({ _id: req.params.id });
+    if (!corpus) {
+      return res.status(400).json({
+        message: "corpus not found",
+      });
+    }
+    const corpusUpdate = await CorpusModel.updateOne(
+      { _id: corpus._id },
+      {
+        $set: {
+          [`entries.${language.name}`]: req.body.content,
+        },
+      }
+    );
+    corpus = await CorpusModel.findOne({ _id: corpus._id });
+    res.status(201).json(corpus);
+  } catch (err) {
+    console.debug(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
 };
 
 exports.deleteRow = async (req, res) => {
@@ -23,6 +79,20 @@ exports.deleteRow = async (req, res) => {
 exports.showAllRow = async (req, res) => {
   try {
     const corpus = await CorpusModel.find();
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Content-Range", "bytes : 0-9/");
+    res.status(200).json(corpus);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};
+
+exports.showSingleRow = async (req, res) => {
+  try {
+    const corpus = await CorpusModel.findById(req.params.id);
     res.setHeader("Access-Control-Expose-Headers", "Content-Range");
     res.setHeader("Content-Range", "bytes : 0-9/");
     res.status(200).json(corpus);

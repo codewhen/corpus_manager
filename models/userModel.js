@@ -44,6 +44,14 @@ UserSchema.methods.isValidPassword = async function (password) {
   return compare;
 };
 
+UserSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    delete ret.__id;
+  },
+});
+
 const UserModel = mongoose.model("user", UserSchema);
 
 module.exports = UserModel;

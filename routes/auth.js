@@ -45,6 +45,12 @@ router.put(
   AuthController.updateUser
 );
 
+router.get(
+  "/role",
+  passport.authenticate("jwt", { session: false }),
+  AuthController.getUserRole
+);
+
 router.post("/login", AuthController.login);
 
 module.exports = router;

@@ -41,11 +41,20 @@ router.get(
   CorpusController.showUnassignedRow
 );
 
-router.post(
-  "/assignUser",
+router.put(
+  "/assignUser/:id",
   passport.authenticate("jwt", { session: false }),
   mustAdmin,
   CorpusController.assignUser
+);
+
+router.get(
+  "/assignUser/:id",
+  passport.authenticate("jwt", { session: false }),
+  mustAdmin,
+  (req, res) => {
+    res.status(200).json({ id: req.params.id });
+  }
 );
 
 router.get(

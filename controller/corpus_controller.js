@@ -93,7 +93,7 @@ exports.showAllRow = async (req, res) => {
 exports.showSingleRow = async (req, res) => {
   try {
     const corpus = await CorpusModel.findById(req.params.id);
-    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    corpus.res.setHeader("Access-Control-Expose-Headers", "Content-Range");
     res.setHeader("Content-Range", "bytes : 0-9/");
     res.status(200).json(corpus);
   } catch (err) {
@@ -113,9 +113,10 @@ exports.showUnassignedRow = async (req, res) => {
     const corpus = await CorpusModel.find({
       $or: [{ assigned: null }, { assignedAt: { $lt: cutoff } }],
     }).limit(50);
-    res.status(200).json({
-      corpus: corpus,
-    });
+
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Content-Range", "bytes : 0-50/50");
+    res.status(200).json(corpus);
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -127,20 +128,17 @@ exports.showUnassignedRow = async (req, res) => {
 exports.assignUser = async (req, res) => {
   try {
     const data = req.body;
-    if (!data.userId || !data.rowIds) {
+    if (!data.userId || !req.params.id) {
       res.status(400).json({
         message: "userId or rowIds missing",
       });
     }
-    for (const rowId of data.rowIds) {
-      await CorpusModel.updateOne(
-        { _id: rowId },
-        { assigned: data.userId, assignedAt: Date.now() }
-      );
-    }
-    res.status(200).json({
-      message: `${data.rowIds.length} are assigned`,
-    });
+    await CorpusModel.updateOne(
+      { _id: req.params.id },
+      { assigned: data.userId, assignedAt: Date.now() }
+    );
+    const corpus = await CorpusModel.findById(req.params.id);
+    res.status(200).json(corpus);
   } catch (err) {
     console.log(err);
     res.status(500).json({

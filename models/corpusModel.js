@@ -28,6 +28,14 @@ CorpusSchema.set("toJSON", {
   },
 });
 
+CorpusSchema.virtual("isAssigned").get(function () {
+  //Aging// 5 days//
+  var cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 5);
+  //End Aging//
+  return this.assigned != null && this.assigned && this.assignedAt > cutoff;
+});
+
 const CorpusModel = mongoose.model("corpus", CorpusSchema);
 
 module.exports = CorpusModel;

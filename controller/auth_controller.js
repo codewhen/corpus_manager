@@ -131,3 +131,17 @@ exports.setRole = async (req, res, next) => {
     user: user,
   });
 };
+
+exports.getUserRole = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "user not found" });
+    }
+    const user = await UserModel.findById(req.user._id);
+    res.status(200).json({ role: user.role });
+  } catch (err) {
+    return res.status(500).json({
+      message: err,
+    });
+  }
+};

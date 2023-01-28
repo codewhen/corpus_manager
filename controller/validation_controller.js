@@ -1,0 +1,165 @@
+const { mustAdmin } = require("../middleware/auth/admin");
+const CorpusModel = require("../models/corpusModel");
+const LanguageModel = require("../models/languageModel");
+const UserModel = require("../models/userModel");
+
+exports.update = async (req, res) => {
+  if (!req.body.language || !req.body.content || !req.params.id) {
+    return res.status(400).json({
+      message: "language or content or corpusId is missing in body",
+    });
+  }
+  try {
+    const language = await LanguageModel.findById(req.body.language);
+    if (!language) {
+      return res.status(400).json({
+        message: "language not found",
+      });
+    }
+    let corpus = await CorpusModel.findOne({ _id: req.params.id });
+    if (!corpus) {
+      return res.status(400).json({
+        message: "corpus not found",
+      });
+    }
+    const corpusUpdate = await CorpusModel.updateOne(
+      { _id: corpus._id },
+      {
+        $set: {
+          [`entriesValid.${language.name}`]: req.body.content,
+        },
+      }
+    );
+    corpus = await CorpusModel.findOne({ _id: corpus._id });
+    res.status(201).json(corpus);
+  } catch (err) {
+    console.debug(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};
+
+exports.deleteRow = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({
+      message: "id is missing in param",
+    });
+  }
+  const corpus = await CorpusModel.updateOne(
+    { _id: req.params.id },
+    {
+      $set: {
+        entriesValid: {},
+      },
+    }
+  );
+  res.status(201).json(corpus);
+};
+
+exports.showAllRow = async (req, res) => {
+  try {
+    console.log(" show all row run");
+    const corpus = await CorpusModel.find();
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Content-Range", "bytes : 0-9/");
+    res.status(200).json(corpus);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};
+
+exports.showRowDependingOnRole = async (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "User is not login" });
+  }
+  const user = await UserModel.findById(req.user._id);
+  const isAdmin = user.role === "admin";
+  if (isAdmin) {
+    return this.showAllRow(req, res, next);
+  } else {
+    return this.getAssignedRowsForCurrentUser(req, res, next);
+  }
+};
+
+exports.showSingleRow = async (req, res) => {
+  try {
+    const corpus = await CorpusModel.findById(req.params.id);
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Content-Range", "bytes : 0-9/");
+    res.status(200).json(corpus);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};
+
+exports.showUnassignedRow = async (req, res) => {
+  try {
+    //Aging// 5 days//
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 5);
+    //End Aging//
+    const corpus = await CorpusModel.find({
+      $or: [{ assignedValid: null }, { assignedAtValid: { $lt: cutoff } }],
+    }).limit(50);
+
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Content-Range", "bytes : 0-50/50");
+    res.status(200).json(corpus);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};
+
+exports.assignUser = async (req, res) => {
+  try {
+    const data = req.body;
+    if (!data.userId || !req.params.id) {
+      res.status(400).json({
+        message: "userId or rowIds missing",
+      });
+    }
+    await CorpusModel.updateOne(
+      { _id: req.params.id },
+      { assignedValid: data.userId, assignedAtValid: Date.now() }
+    );
+    const corpus = await CorpusModel.findById(req.params.id);
+    res.status(200).json(corpus);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};
+
+exports.getAssignedRowsForCurrentUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    //Aging// 5 days//
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 5);
+    //End Aging//
+    const corpus = await CorpusModel.find({
+      $and: [{ assignedValid: userId }, { assignedAtValid: { $gte: cutoff } }],
+    });
+
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Content-Range", "bytes : 0-9/");
+    res.status(200).json(corpus);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: err,
+    });
+  }
+};

@@ -14,6 +14,7 @@ var usersRouter = require("./routes/users");
 var authRouter = require("./routes/auth");
 var languageRouter = require("./routes/language");
 var corpusRouter = require("./routes/corpus");
+var validationRouter = require("./routes/vallidation");
 
 var app = express();
 require("./middleware/auth/auth");
@@ -45,6 +46,7 @@ app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/lang", languageRouter);
 app.use("/corpus", corpusRouter);
+app.use("/validation", validationRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

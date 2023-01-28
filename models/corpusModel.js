@@ -14,6 +14,16 @@ const CorpusSchema = new Schema(
     assignedAt: {
       type: Date,
     },
+    entriesValid: {
+      type: Map,
+      of: String,
+    },
+    assignedValid: {
+      type: mongoose.Types.ObjectId,
+    },
+    assignedAtValid: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
@@ -34,6 +44,18 @@ CorpusSchema.virtual("isAssigned").get(function () {
   cutoff.setDate(cutoff.getDate() - 5);
   //End Aging//
   return this.assigned != null && this.assigned && this.assignedAt > cutoff;
+});
+
+CorpusSchema.virtual("isAssignedValid").get(function () {
+  //Aging// 5 days//
+  var cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 5);
+  //End Aging//
+  return (
+    this.assignedValid != null &&
+    this.assignedValid &&
+    this.assignedAtValid > cutoff
+  );
 });
 
 const CorpusModel = mongoose.model("corpus", CorpusSchema);

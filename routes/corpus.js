@@ -17,6 +17,13 @@ router.get(
 );
 
 router.get(
+  "/all/admin",
+  mustAdmin,
+  passport.authenticate("jwt", { session: false }),
+  CorpusController.showAllRow
+);
+
+router.get(
   "/all/:id",
   passport.authenticate("jwt", { session: false }),
   CorpusController.showSingleRow
@@ -55,12 +62,6 @@ router.get(
   (req, res) => {
     res.status(200).json({ id: req.params.id });
   }
-);
-
-router.get(
-  "/getAssignedRowsForCurrentUser",
-  passport.authenticate("jwt", { session: false }),
-  CorpusController.getAssignedRowsForCurrentUser
 );
 
 module.exports = router;

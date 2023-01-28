@@ -93,7 +93,7 @@ exports.showAllRow = async (req, res) => {
 exports.showSingleRow = async (req, res) => {
   try {
     const corpus = await CorpusModel.findById(req.params.id);
-    corpus.res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
     res.setHeader("Content-Range", "bytes : 0-9/");
     res.status(200).json(corpus);
   } catch (err) {
@@ -156,10 +156,11 @@ exports.getAssignedRowsForCurrentUser = async (req, res) => {
     //End Aging//
     const corpus = await CorpusModel.find({
       $and: [{ assigned: userId }, { assignedAt: { $gte: cutoff } }],
-    }).limit(50);
-    res.status(200).json({
-      corpus: corpus,
     });
+
+    res.setHeader("Access-Control-Expose-Headers", "Content-Range");
+    res.setHeader("Content-Range", "bytes : 0-9/");
+    res.status(200).json(corpus);
   } catch (err) {
     console.log(err);
     res.status(500).json({

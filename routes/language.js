@@ -15,7 +15,6 @@ router.post(
 router.get(
   "/all",
   passport.authenticate("jwt", { session: false }),
-  mustAdmin,
   LanguageController.allLanguage
 );
 

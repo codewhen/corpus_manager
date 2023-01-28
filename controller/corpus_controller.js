@@ -1,5 +1,6 @@
 const CorpusModel = require("../models/corpusModel");
 const LanguageModel = require("../models/languageModel");
+const UserModel = require("../models/userModel");
 
 exports.create = async (req, res) => {
   if (!req.body.language || !req.body.content) {
@@ -74,6 +75,19 @@ exports.deleteRow = async (req, res) => {
   }
   const corpus = await CorpusModel.deleteOne({ _id: req.params.id });
   res.status(201).json(corpus);
+};
+
+exports.showRowDependingOnRole = async (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: "User is not login" });
+  }
+  const user = await UserModel.findById(req.user._id);
+  const isAdmin = user.role === "admin";
+  if (isAdmin) {
+    return this.showAllRow(req, res, next);
+  } else {
+    return this.getAssignedRowsForCurrentUser(req, res, next);
+  }
 };
 
 exports.showAllRow = async (req, res) => {

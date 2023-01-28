@@ -13,7 +13,7 @@ router.post(
 router.get(
   "/all",
   passport.authenticate("jwt", { session: false }),
-  CorpusController.showAllRow
+  CorpusController.showRowDependingOnRole
 );
 
 router.get(
@@ -21,6 +21,12 @@ router.get(
   mustAdmin,
   passport.authenticate("jwt", { session: false }),
   CorpusController.showAllRow
+);
+
+router.get(
+  "/all/user",
+  passport.authenticate("jwt", { session: false }),
+  CorpusController.showUnassignedRow
 );
 
 router.get(
